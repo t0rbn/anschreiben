@@ -4,13 +4,19 @@ let addItem = {
             event.preventDefault();
             addItem.addLine(this.closest('form'));
         });
+
+        $("body").on("click", ".increment-button", function(event) {
+            event.preventDefault();
+            $(this).closest("form").clone().insertAfter($(this).closest('form'));
+            calculateSum.updatePrice();
+        });
     },
     addLine: function(line) {
-        var newLine = $(".template-form").clone()
+        var newLine = $(".template-form").clone();
         var name = $(line).find("#name").val();
         var price = $(line).find("#price").val();
-        $(line).find("#name").val(null)
-        $(line).find("#price").val(null)
+        $(line).find("#name").val(null);
+        $(line).find("#price").val(null);
         if (name && price) {
             newLine.find(".price").addClass("visible-price").attr("value", price);
             newLine.find(".name").addClass("visible-name").attr("value", name);
@@ -53,7 +59,7 @@ let calculateTip = {
             var sum = parseFloat($("#sum").html());
             var tippedPrice = sum * tip;
             var priceToPay = Math.round(tippedPrice).toFixed(2);
-            var actualTip = (priceToPay/sum).toFixed(2);
+            var actualTip = (((priceToPay/sum)-1)*100).toFixed(2);
             if (tip && sum) {
                 $("#price-to-pay").html(priceToPay);
                 $("#rounded-tip").html(actualTip);
