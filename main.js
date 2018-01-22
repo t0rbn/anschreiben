@@ -7,7 +7,7 @@ let addItem = {
 
         $("body").on("click", ".increment-button", function(event) {
             event.preventDefault();
-            $(this).closest("form").clone().insertAfter($(this).closest('form'));
+            $(this).closest("div").clone().insertAfter($(this).closest('div'));
             calculateSum.updatePrice();
         });
     },
@@ -18,10 +18,11 @@ let addItem = {
         $(line).find("#name").val(null);
         $(line).find("#price").val(null);
         if (name && price) {
-            newLine.find(".price").addClass("visible-price").attr("value", price);
-            newLine.find(".name").addClass("visible-name").attr("value", name);
+            newLine.find(".price").addClass("visible-price").html(price);
+            newLine.find(".name").addClass("visible-name").html(name);
             newLine.removeClass("d-none template-form");
             $(newLine).insertAfter($(line));
+
             calculateSum.updatePrice();
         }
     }
@@ -31,7 +32,7 @@ let removeItem = {
     bindButton: function() {
         $("body").on("click", ".remove-button", function(event) {
             event.preventDefault();
-            $(this).closest('form').remove();
+            $(this).closest('div').remove();
             calculateSum.updatePrice();
         });
     }
@@ -42,7 +43,7 @@ let calculateSum = {
         var sum = 0;
         var items = 0;
         $('.visible-price').each(function (){
-            sum += parseFloat($(this).val());
+            sum += parseFloat($(this).html());
         });
         $('.visible-name').each(function (){
             items++; 
