@@ -5,9 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>Anschreiben</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     </head>
     <body>
-        <div class="container-fluid">
+    <div id="app">
             <div class="row">
                 <div class="col-12 text-center">
                     <h1>Welcome to Anschreiben</h1>
@@ -22,30 +23,22 @@
                         </div>
                         <div class="card-body">
                             <div class="card-text">
-                                <form class="form-inline justify-content-center">
+                                <div class="form-inline justify-content-center">
                                     <div class="form-group mb-2">
-                                        <input type="text" class="form-control" id="name" placeholder="Jug of moonshine">
+                                        <input type="text" class="new-item form-control" id="name" v-model="newItem.name" placeholder="Jug of moonshine">
                                     </div>
                                     <div class="form-group mx-sm-3 mb-2">
-                                        <input type="number" class="form-control" id="price" placeholder="3.90">
+                                        <input type="number" class="new-item form-control" id="price" v-model="newItem.price" placeholder="3.90">
                                     </div>
-                                    <button id="add" class="btn btn-primary mb-2 add-button"><i class="fa fa-plus"></i> Add
+                                    <button id="add" class="btn btn-primary mb-2 add-button" @click="addItem()"><i class="fa fa-plus"></i> Add
                                     </button>
-                                </form>
-                                <div class="justify-content-center text-center template-form d-none">
-                                        <span class="name"></span>
-                                        <span class="price"></span>
-                                        <button type="button" class="btn btn-sm btn-success mb-2 increment-button"><i class="fa fa-plus"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger mb-2 remove-button"><i class="fa fa-times"></i>
-                                        </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-center">
+            <div class="row justify-content-center" v-show="items.length" v-cloak>
                 <div class="col-xs-12 col-lg-8">
                     <div class="card">
                         <div class="card-header">
@@ -53,34 +46,47 @@
                         </div>
                         <div class="card-body">
                             <div class="card-text text-center">
+                                <div class="row justify-content-center" v-for="(item, index) in items">
+                                    <div class="justify-content-center text-center">
+                                        <span class="amount">{{item.amount}} x</span>
+                                        <span class="name">{{item.name}}</span>
+                                        <span class="price">{{item.price | currency}}</span>
+                                        <button type="button" class="btn btn-sm btn-success mb-2 " @click="increaseItemAmount(item)"><i class="fa fa-plus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-success mb-2 " @click="decreaseItemAmount(item)"><i class="fa fa-minus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger mb-2 remove-button" @click="removeItem(item)"><i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-8">
-                                        <p>You ordered <span id="number-of-items">0</span> Items for a total of</p>
+                                        <p class="h4">You ordered <span id="number-of-items">{{totalItemCount}}</span> Items for a total of</p>
                                     </div>
                                     <div class="col-4">
-                                        <p id="sum">0.00</p>
+                                        <p class="h4" id="sum">{{totalPrice | currency}}</p>
                                     </div>
                                 </div>
                                 Please choose a tip below <br>
                                 <div class="btn-group btn-group-lg btn-group-toggle pt-2" data-toggle="buttons">
-                                    <label class="btn btn-primary tip-button">
-                                        <input type="radio" name="options" id="5-percent" data-tip="1.05" autocomplete="off"> 5%
+                                    <label class="btn btn-primary tip-button" @click="setSelectedTip(1.05)">
+                                        <input type="radio" name="options" id="5-percent" data-tip="1.05" autocomplete="off" > 5%
                                     </label>
-                                    <label class="btn btn-lg btn-primary tip-button">
-                                        <input type="radio" name="options" id="10-percent" data-tip="1.10" autocomplete="off"> 10%
+                                    <label class="btn btn-lg btn-primary tip-button" @click="setSelectedTip(1.10)">
+                                        <input type="radio" name="options" id="10-percent" data-tip="1.10" autocomplete="off" > 10%
                                     </label>
-                                    <label class="btn btn-lg btn-primary tip-button">
-                                        <input type="radio" name="options" id="15-percent" data-tip="1.15" autocomplete="off"> 15%
+                                    <label class="btn btn-lg btn-primary tip-button" @click="setSelectedTip(1.15)">
+                                        <input type="radio" name="options" id="15-percent" data-tip="1.15" autocomplete="off" > 15%
                                     </label>
-                                </div> 
-                                <p class="pt-2 payment-info d-none">Paying <span id="price-to-pay"></span> equals a tip of <span id="rounded-tip"></span>%</p>
+                                </div>
+                                <p class="pt-2 payment-info h3" v-show="priceWithTip && actualTip">Paying <span id="price-to-pay">{{priceWithTip | currency}}</span> equals a tip of <span id="rounded-tip">{{actualTip}}</span>%</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div> 
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        </div>
+    </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script src="main.js"></script>
