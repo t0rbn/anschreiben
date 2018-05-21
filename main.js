@@ -3,20 +3,21 @@ Vue.component('item-row', {
   template: ''
 });
 // localStorage persistence
-var STORAGE_KEY = 'anschreiben'
+const ITEM_STORAGE_KEY = 'anschreiben - todos';
+const MISC_STORAGE_KEY = 'anschreiben - misc';
 var itemStorage = {
   fetch: function () {
-    var items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+    var items = JSON.parse(localStorage.getItem(ITEM_STORAGE_KEY) || '[]');
     items.forEach(function (item, index) {
       item.id = index
-    })
-    itemStorage.uid = items.length
+    });
+    itemStorage.uid = items.length;
     return items
   },
   save: function (items) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+    localStorage.setItem(ITEM_STORAGE_KEY, JSON.stringify(items));
   }
-}
+};
 
 var app = new Vue({
   el: '#app',
@@ -54,16 +55,23 @@ var app = new Vue({
       return totalPrice;
     },
     priceWithTip: function() {
-      return Math.round(this.totalPrice * this.selectedTip).toFixed(2);
+      return Math.round(this.totalPrice * this.selectedTip);
     },
     actualTip: function() {
-      return (((this.priceWithTip/this.totalPrice)-1)*100.00).toFixed(2);
+      return (((this.priceWithTip/this.totalPrice)-1)*100.00);
     }
   },
 
   filters: {
-    currency: function(number, digits) {
-      return number.toLocaleString('de-DE', {style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2})
+    currency: function(value, digits) {
+      let number = parseFloat(value);
+      let options = {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      };
+      return number.toLocaleString('de-DE', options)
     }
   },
   methods: {
