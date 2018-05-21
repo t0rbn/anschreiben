@@ -58,7 +58,7 @@ var app = new Vue({
       return Math.round(this.totalPrice * this.selectedTip);
     },
     actualTip: function() {
-      return (((this.priceWithTip/this.totalPrice)-1)*100.00);
+      return (((this.priceWithTip/this.totalPrice)-1)*100.00).toFixed(2);
     }
   },
 
