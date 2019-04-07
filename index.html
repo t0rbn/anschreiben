@@ -9,7 +9,7 @@
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     </head>
     <body>
-    <div id="app">
+    <div id="app" class="container" v-cloak>
             <div class="row">
                 <div class="col-12 text-center">
                     <h1>Welcome to Anschreiben</h1>
@@ -17,39 +17,56 @@
                 </div>
             </div>
             <div class="row justify-content-center pb-2">
-                <div class="col-xs-12 col-lg-8">
+                <div class="col-12 col-lg-8">
                     <div class="card">
-                        <div class="card-header">
-                            <h4>Your orders</h4>
+                        <div class="card-header container">
+                            <div class="row align-items-center justify-content-between">
+                                <div class="col">
+                                    <p class="h4">Your orders</p>
+                                </div>
+                                <div class="col text-right" v-if="items.length > 0">
+                                    <div v-if="!confirmClearOrders">
+                                        <button class="btn btn-danger btn-sm" @click="toggleClearConfirmDialoge"><i class="fa fa-trash"></i> Clear Orders</button>
+                                    </div>
+                                    <div v-if="confirmClearOrders" class="btn-group btn-group-sm">
+                                        <button class="btn btn-danger btn-sm" @click="removeAllItems">Clear</button>
+                                        <button class="btn btn-warning btn-sm" @click="toggleClearConfirmDialoge">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="card-text">
-                                <div class="form-inline justify-content-center">
-                                    <div class="form-group mb-2">
+                                <div class="form-inline justify-content-center align-items-center d-flex">
+                                    <div class="form-group mx-3 mb-2">
                                         <input type="text" class="new-item form-control" id="name" v-model="newItem.name" placeholder="Jug of moonshine">
                                     </div>
-                                    <div class="form-group mx-sm-3 mb-2">
-                                        <input type="number" class="new-item form-control" id="price" v-model="newItem.price" placeholder="3.90">
+                                    <div class="form-group mx-3 mb-2">
+                                        <input type="number" class="new-item form-control" id="price" v-model="newItem.price" placeholder="eg 3.90">
                                     </div>
-                                    <button id="add" class="btn btn-primary mb-2 add-button" @click="addItem()"><i class="fa fa-plus"></i> Add
-                                    </button>
+                                    <button id="add" class="btn btn-primary mb-2 add-button" :disabled="!newItem.price" @click="addItem"><i class="fa fa-plus"></i> Add item</button>
                                 </div>
                                 <hr>
-                                <div class="row justify-content-center" v-for="(item, index) in items">
-                                    <div class="col-3 justify-content-center text-center">
-                                        <span class="amount">{{item.amount}} x</span>
-                                        <span class="name">{{item.name}}</span>
-                                        <span class="price">{{item.price | currency}}</span>
+                                <template v-for="(item, index) in items.slice().reverse()">
+                                    <div class="row justify-content-center align-items-center mb-2" >
+                                        <div class="col col-lg-3">
+                                            <span class="name h5">{{item.name}}</span><br>
+                                            <span class="amount lead">{{item.amount}} x</span>
+                                            <span class="price lead">{{item.price | currency}}</span>
+                                        </div>
+                                        <div class="col col-lg-3 text-right">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-sm btn-secondary" @click="increaseItemAmount(item)"><i class="fa fa-plus"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-secondary" @click="decreaseItemAmount(item)"><i class="fa fa-minus"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger" @click="removeItem(item)"><i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-2">
-                                        <button type="button" class="btn btn-sm btn-success mb-2 item-action-button" @click="increaseItemAmount(item)"><i class="fa fa-plus"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-success mb-2 item-action-button" @click="decreaseItemAmount(item)"><i class="fa fa-minus"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger mb-2 item-action-button" @click="removeItem(item)"><i class="fa fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                    <hr>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -63,11 +80,15 @@
                         </div>
                         <div class="card-body">
                             <div class="card-text text-center">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <p class="h4">You ordered <span id="number-of-items">{{totalItemCount}}</span> Items for a total of</p>
+                                <div class="row align-items-center justify-content-center">
+                                    <div class="col">
+                                        <p class="lead">
+                                            You ordered <br>
+                                            <span class="h5">{{totalItemCount}} Items</span> <br>
+                                            for a total of
+                                        </p>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col">
                                         <p class="h4" id="sum">{{totalPrice | currency}}</p>
                                     </div>
                                 </div>
@@ -83,7 +104,12 @@
                                         <input type="radio" name="options" id="15-percent" data-tip="1.15" autocomplete="off" > 15%
                                     </label>
                                 </div>
-                                <p class="pt-2 payment-info h3" v-show="selectedTip">Paying <span id="price-to-pay">{{priceWithTip | currency}}</span> equals a tip of <span id="rounded-tip">{{actualTip}}</span>%</p>
+                                <p class="pt-2 h3 lead" v-show="selectedTip">
+                                    Paying <br>
+                                    <span class="h4">{{priceWithTip | currency}}</span> <br>
+                                    equals a tip of <br>
+                                    <span class="h4">{{actualTip}}</span>%
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -25,7 +25,8 @@ var app = new Vue({
     newItem: {
     },
     items: itemStorage.fetch(),
-    selectedTip: 0
+    selectedTip: 0,
+    confirmClearOrders: false
   },
 
   watch: {
@@ -97,6 +98,13 @@ var app = new Vue({
     },
     setSelectedTip: function(selectedTip) {
       this.selectedTip = selectedTip;
+    },
+    toggleClearConfirmDialoge: function() {
+      this.confirmClearOrders = !this.confirmClearOrders;
+    },
+    removeAllItems: function() {
+      this.confirmClearOrders = false
+      this.items = []
     }
   }
 });
